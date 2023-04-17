@@ -33,28 +33,27 @@
 -->
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox prefHeight="400.0" prefWidth="831.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="266.0" prefWidth="528.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
   <children>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="400.0" prefWidth="510.0" VBox.vgrow="ALWAYS">
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="277.0" prefWidth="663.0" VBox.vgrow="ALWAYS">
       <children>
-            <TextField fx:id="idField" layoutX="28.0" layoutY="20.0" promptText="steamappid" />
-            <Button fx:id="btSend" layoutX="184.0" layoutY="20.0" mnemonicParsing="false" onAction="#searchsteamapp" text="send" />
-            <TextArea fx:id="textArea" layoutX="27.0" layoutY="55.0" prefHeight="306.0" prefWidth="198.0" />
-            <TextField fx:id="idUser" layoutX="244.0" layoutY="20.0" promptText="userid" />
-            <Button fx:id="btSend1" layoutX="400.0" layoutY="20.0" mnemonicParsing="false" onAction="#searchSteamID" text="send" />
-            <TextArea fx:id="textArea2" layoutX="457.0" layoutY="55.0" prefHeight="306.0" prefWidth="198.0" />
-            <TextField fx:id="vanityURL" layoutX="678.0" layoutY="19.0" prefHeight="26.0" prefWidth="130.0" promptText="vaniturl" />
-            <Button fx:id="btConvert" layoutX="678.0" layoutY="55.0" mnemonicParsing="false" onAction="#convertVanity" prefHeight="26.0" prefWidth="130.0" text="convert" />
-            <Text layoutX="678.0" layoutY="105.0" strokeType="OUTSIDE" strokeWidth="0.0" text="SteamID:" wrappingWidth="130.4000000000001" />
-            <TextField fx:id="steamID" editable="false" layoutX="678.0" layoutY="117.0" prefHeight="26.0" prefWidth="130.0" />
-            <ListView fx:id="textArea1" layoutX="244.0" layoutY="55.0" prefHeight="306.0" prefWidth="200.0" />
+            <TextField fx:id="idField" layoutX="135.0" layoutY="107.0" prefHeight="26.0" prefWidth="258.0" promptText="SteamID or CommunityURL" />
+            <Button fx:id="btCalculate" layoutX="135.0" layoutY="145.0" mnemonicParsing="false" onAction="#calculate" prefHeight="26.0" prefWidth="258.0" text="Calculate" />
+            <Text layoutX="66.0" layoutY="52.0" strokeType="OUTSIDE" strokeWidth="0.0" text="How long have I wasted my life?" wrappingWidth="396.0960693359375">
+               <font>
+                  <Font size="27.0" />
+               </font>
+            </Text>
+            <Text layoutX="129.0" layoutY="96.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your SteamID or CommunityURL down below" />
+            <ProgressBar fx:id="pgBar" layoutX="164.0" layoutY="189.0" prefWidth="200.0" progress="0.0" visible="false" />
+            <Text fx:id="txtBar" layoutX="253.0" layoutY="226.0" strokeType="OUTSIDE" strokeWidth="0.0" />
       </children>
     </AnchorPane>
   </children>

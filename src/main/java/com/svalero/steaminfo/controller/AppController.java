@@ -1,5 +1,6 @@
 package com.svalero.steaminfo.controller;
 
+import com.svalero.steaminfo.model.AllData;
 import com.svalero.steaminfo.model.Game;
 import com.svalero.steaminfo.model.Player;
 import com.svalero.steaminfo.model.ResponseVanityURL;
@@ -8,20 +9,27 @@ import com.svalero.steaminfo.task.GameInfoTask;
 import com.svalero.steaminfo.task.GameListTask;
 import com.svalero.steaminfo.task.UserInfoTask;
 import com.svalero.steaminfo.task.VanityConverterTask;
+import com.svalero.steaminfo.util.R;
 import io.reactivex.functions.Consumer;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
-import lombok.Value;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -30,100 +38,168 @@ public class AppController {
     @FXML
     public TextField idField;
     @FXML
-    public TextField idUser;
-    @FXML
-    public TextField vanityURL;
-    @FXML
-    public TextField steamID;
-    @FXML
     public Button btSend;
     @FXML
-    public Button btSend1;
+    public ProgressBar pgBar;
     @FXML
-    public Button btConvert;
-    @FXML
-    public TextArea textArea;
-    @FXML
-    public ListView textArea1;
-    @FXML
-    public TextArea textArea2;
+    public Text txtBar;
+
     private String API_KEY = loadApiKey();
     public GameInfoTask gameInfoTask;
     public GameListTask gameListTask;
     public UserInfoTask userInfoTask;
     public VanityConverterTask vanityConverterTask;
 
+    private String idSteam;
+    private boolean correct;
+    private Player player;
+    private List<Game> games;
+
+
     @FXML
-    public void searchsteamapp(ActionEvent actionEvent){
+    public void calculate(ActionEvent actionEvent) throws InterruptedException {
+        correct = true;
+        player = null;
+        games = new ArrayList<>();
+        idSteam = "";
+        String id = idField.getText();
+        String url = "https://steamcommunity.com/id/";
+        pgBar.setVisible(true);
+        txtBar.setText("Getting your info...");
 
-        Integer idgame = Integer.parseInt(idField.getText());
-        System.out.println(idgame);
-        this.idField.setText("");
-        this.textArea.setText("");
+        if(id.contains(url)){
+            int index = id.indexOf(url) + url.length();
+            String idFormatted = id.substring(index);
 
-        Consumer<Map<String, IDApp>> mapConsumer = (test) -> {
-            String previousText;
-            previousText = textArea.getText() + "\n";
-            Thread.sleep(10);
-            for (Map.Entry<String, IDApp> entry : test.entrySet()) {
-                textArea.setText(previousText + "Key = " + entry.getKey() + ", Value = " + entry.getValue());
-                System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+            if(idFormatted.endsWith("/")){
+                idFormatted = idFormatted.substring(0, idFormatted.length() -1);
+            }
 
+            checkVanityURL(idFormatted);
+            pgBar.setProgress(10.);
+        } else {
+            boolean isIdNumber;
+            Long userID = null;
+
+            try{
+                userID = Long.parseLong(id);
+                isIdNumber = true;
+                idSteam = id;
+
+            }
+            catch (NumberFormatException nfe){
+                isIdNumber = false;
+            }
+
+            if(isIdNumber){
+                Consumer<List<Player>> playerConsumer = (userAPI) -> {
+                    if(userAPI.isEmpty()){
+                        correct = false;
+                    } else {
+                        correct = true;
+                        for (Player p:userAPI){
+                            player = p;
+                        }
+                    }
+                    pgBar.setProgress(30.);
+                };
+
+                this.userInfoTask = new UserInfoTask(playerConsumer, API_KEY, userID);
+                new Thread(userInfoTask).start();
+            } else {
+                checkVanityURL(id);
+                pgBar.setProgress(30.);
+            }
+        }
+
+        while (correct && idSteam.length()==0){
+            Thread.sleep(1000);
+            System.out.print(correct);
+            System.out.println(idSteam.length());
+        }
+
+        Alert alert;
+        if(!correct){
+            pgBar.setProgress(100.);
+            txtBar.setText("SteamID not found");
+            alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("SteamID not found");
+            alert.setContentText("SteamID not found, please, check the ID or VanityURL");
+
+            alert.showAndWait();
+
+        } else {
+            if (player == null) {
+                Consumer<List<Player>> playerConsumer = (userAPI) -> {
+                    if(userAPI.isEmpty()){
+                        correct = false;
+                    } else {
+                        correct = true;
+                        for (Player p:userAPI){
+                            player = p;
+                        }
+                    }
+                };
+
+                this.userInfoTask = new UserInfoTask(playerConsumer, API_KEY, Long.parseLong(idSteam));
+                new Thread(userInfoTask).start();
+            }
+
+            Consumer<List<Game>> gameConsumer = (gameApi) -> {
+                games.addAll(gameApi);
+            };
+
+            this.gameListTask = new GameListTask(API_KEY, Long.parseLong(idSteam), gameConsumer, true);
+            new Thread(gameListTask).start();
+            txtBar.setText("Getting your games...");
+            pgBar.setProgress(40.);
+
+            while (games.isEmpty() || player == null){
+                if(pgBar.getProgress() <= 99.){
+                    pgBar.setProgress(pgBar.getProgress() + 1.);
+                    Thread.sleep(100);
+                }
+            }
+            pgBar.setProgress(100.);
+            AllData allData = new AllData(player, games);
+
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(R.getUI("userInfo.fxml"));
+                    loader.setController(new UserInfoController(allData));
+                    VBox vbox = null;
+                    try {
+                        vbox = loader.load();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Scene scene = new Scene(vbox);
+                    Stage stage = new Stage();
+                    stage.setScene(scene);
+                    stage.setTitle("UserInfo");
+                    stage.show();
+                }
+            });
+        }
+    }
+
+    private void checkVanityURL(String idFormatted) {
+        Consumer<ResponseVanityURL> vanityConsumer = (vanityAPI) -> {
+            if(vanityAPI.getSuccess() == 1){
+                correct = true;
+                idSteam = vanityAPI.getSteamid();
+            } else {
+                correct = false;
             }
         };
 
-        this.gameInfoTask = new GameInfoTask(idgame, mapConsumer);
-        new Thread(gameInfoTask).start();
-    }
-
-    @FXML
-    public void searchSteamID(ActionEvent actionEvent){
-        Long userid = Long.parseLong(idUser.getText());
-        System.out.println(userid);
-        this.idUser.setText("");
-        this.textArea2.setText("");
-
-
-        Consumer<List<Game>> gameConsumer = (test1) -> {
-            ObservableList<Game> games = FXCollections.observableArrayList();
-            games.addAll(test1);
-            textArea1.setFixedCellSize(40);
-            textArea1.setItems(games);
-        };
-
-        this.gameListTask = new GameListTask(API_KEY, userid, gameConsumer, true);
-        new Thread(gameListTask).start();
-
-
-        Consumer<List<Player>> playerConsumer = (test2) -> {
-            Thread.sleep(10);
-            for (Player player:test2){
-                textArea2.setText(textArea2.getText() + player.toString() + "\n");
-            }
-
-        };
-
-        this.userInfoTask = new UserInfoTask(playerConsumer, API_KEY, userid);
-        new Thread(userInfoTask).start();
-
-
-    }
-    @FXML
-    public void convertVanity(ActionEvent actionEvent){
-        String vanityURL = this.vanityURL.getText();
-        System.out.println(vanityURL);
-        this.vanityURL.setText("");
-        this.steamID.setText("");
-
-        Consumer<ResponseVanityURL> vanityConsumer = (test3) -> {
-            System.out.println(test3.getSteamid());
-            this.steamID.setText(String.valueOf(test3.getSteamid()));
-        };
-
-        this.vanityConverterTask = new VanityConverterTask(API_KEY, vanityURL, vanityConsumer);
+        this.vanityConverterTask = new VanityConverterTask(API_KEY, idFormatted, vanityConsumer);
         new Thread(vanityConverterTask).start();
-    }
 
+    }
     public String loadApiKey(){
         Properties props = new Properties();
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config.properties")) {
