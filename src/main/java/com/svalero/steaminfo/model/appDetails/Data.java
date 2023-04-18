@@ -33,6 +33,7 @@ public class Data {
     public List<Genre> genres;
     public List<Screenshot> screenshots;
     public Recommendations recommendations;
+    public Achievements achievements;
     public ReleaseDate release_date;
     public SupportInfo support_info;
     public String background;
