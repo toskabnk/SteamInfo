@@ -3,6 +3,11 @@ package com.svalero.steaminfo.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.svalero.steaminfo.model.*;
+import com.svalero.steaminfo.model.achievementRecord.Achievement;
+import com.svalero.steaminfo.model.achievementRecord.AchievementRecord;
+import com.svalero.steaminfo.model.achievementRecord.Playerstats;
+import com.svalero.steaminfo.model.achievementSchema.AchievementSchema;
+import com.svalero.steaminfo.model.achievementSchema.AvailableGameStats;
 import com.svalero.steaminfo.model.appDetails.IDApp;
 import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
@@ -62,5 +67,16 @@ public class SteamService {
         return this.storeAPI.getAppInfo(steamApp);
     }
 
+    public Observable<Achievement> getPlayerAchievements(String key, Long steamID, String appId){
+        return this.steamAPI.getPlayerAchievements(key, steamID, appId).map(AchievementRecord::getPlayerstats)
+                .map(Playerstats::getAchievements).flatMapIterable(achievements -> achievements);
+    }
+
+    public Observable<com.svalero.steaminfo.model.achievementSchema.Achievement> getAchievementSchema(String key, String appId){
+        return this.steamAPI.getAchievementSchema(key, appId).map(AchievementSchema::getGame)
+                .map(com.svalero.steaminfo.model.achievementSchema.Game::getAvailableGameStats)
+                .map(AvailableGameStats::getAchievements)
+                .flatMapIterable(achievements -> achievements);
+    }
 
 }

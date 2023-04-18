@@ -217,10 +217,6 @@ public class UserInfoController implements Initializable {
         tHours.setText(textFormatted);
     }
 
-    @FXML
-    public void searchGame(ActionEvent actionEvent){
-    }
-
     private void setImage(String urlAvatar) throws IOException {
         URL url = new URL(urlAvatar);
         InputStream inputStream = url.openStream();

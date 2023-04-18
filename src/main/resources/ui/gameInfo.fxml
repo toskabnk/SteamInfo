@@ -44,13 +44,13 @@
          <children>
             <ImageView fx:id="ivHeaderImage" fitHeight="394.0" fitWidth="700.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="gameImage" fitHeight="215.0" fitWidth="460.0" pickOnBounds="true" preserveRatio="true" />
-            <ListView fx:id="lvAchievements" layoutX="463.0" layoutY="3.0" prefHeight="386.0" prefWidth="233.0" />
+            <ListView fx:id="lvAchievements" layoutX="463.0" layoutY="3.0" opacity="0.4" prefHeight="386.0" prefWidth="233.0" />
             <Text fx:id="tGameName" layoutX="14.0" layoutY="228.0" strokeType="OUTSIDE" strokeWidth="0.0" text="VideoGameName" wrappingWidth="442.1749954223633" />
-            <Text fx:id="tShortDescription" layoutX="14.0" layoutY="245.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ShortDescription" />
-            <Text fx:id="tWebsite" layoutX="14.0" layoutY="262.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Website" />
-            <Text fx:id="tNOfAchievements" layoutX="14.0" layoutY="279.0" strokeType="OUTSIDE" strokeWidth="0.0" text="NumberOfAchievements" />
-            <Text fx:id="tRecommendations" layoutX="14.0" layoutY="296.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Recommendations" />
-            <Text fx:id="tMetacritc" layoutX="14.0" layoutY="313.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Metacritic" />
+            <Text fx:id="tShortDescription" layoutX="14.0" layoutY="244.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ShortDescription" wrappingWidth="442.1749954223633" />
+            <Text fx:id="tWebsite" layoutX="14.0" layoutY="325.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Website" />
+            <Text fx:id="tNOfAchievements" layoutX="14.0" layoutY="342.0" strokeType="OUTSIDE" strokeWidth="0.0" text="NumberOfAchievements" />
+            <Text fx:id="tRecommendations" layoutX="14.0" layoutY="359.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Recommendations" />
+            <Text fx:id="tMetacritc" layoutX="14.0" layoutY="376.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Metacritic" />
          </children>
     </AnchorPane>
   </children>
