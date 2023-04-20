@@ -55,8 +55,9 @@ public class SteamService {
     public Observable<ResponseVanityURL> getSteamID(String key, String url){
         return this.steamAPI.getSteamID(key, url).map(VanityURL::getResponse);
     }
-    public Observable<List<Game>> getOwnedGames(String key, Long steamID, boolean includeAppInfo, boolean includeFreeGames){
-        return this.steamAPI.getOwnedGames(key, steamID, includeAppInfo, includeFreeGames).map(gameInfoSteamID -> gameInfoSteamID.getResponse().getGames());
+    public Observable<Game> getOwnedGames(String key, Long steamID, boolean includeAppInfo, boolean includeFreeGames){
+        return this.steamAPI.getOwnedGames(key, steamID, includeAppInfo, includeFreeGames).map(gameInfoSteamID -> gameInfoSteamID.getResponse().getGames())
+                .flatMapIterable(games -> games);
     }
 
     public Observable<List<Player>> getPlayerInfo(String key, Long steamID){

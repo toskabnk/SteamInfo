@@ -5,16 +5,14 @@ import com.svalero.steaminfo.service.SteamService;
 import io.reactivex.functions.Consumer;
 import javafx.concurrent.Task;
 
-import java.util.List;
-
 public class GameListTask extends Task<Integer> {
 
-    private Consumer<List<Game>> gameConsumer;
+    private Consumer<Game> gameConsumer;
     private String apiKey;
     private Long userId;
     private boolean includeFreeGames;
 
-    public GameListTask(String apiKey, Long userId, Consumer<List<Game>> gameConsumer, boolean includeFreeGames){
+    public GameListTask(String apiKey, Long userId, Consumer<Game> gameConsumer, boolean includeFreeGames){
         this.gameConsumer = gameConsumer;
         this.apiKey = apiKey;
         this.userId = userId;

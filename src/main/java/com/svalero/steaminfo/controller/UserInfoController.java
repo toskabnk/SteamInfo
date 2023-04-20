@@ -20,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -154,27 +155,37 @@ public class UserInfoController implements Initializable {
                         }
                     }
 
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            FXMLLoader loader = new FXMLLoader();
-                            loader.setLocation(R.getUI("gameInfo.fxml"));
-                            System.out.println(idApp);
-                            loader.setController(new GameInfoController(idApp.getData()));
-                            VBox vbox;
-                            try {
-                                vbox = loader.load();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
+                    if(idApp.getSuccess()){
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                FXMLLoader loader = new FXMLLoader();
+                                loader.setLocation(R.getUI("gameInfo.fxml"));
+                                System.out.println(idApp);
+                                loader.setController(new GameInfoController(idApp.getData()));
+                                VBox vbox;
+                                try {
+                                    vbox = loader.load();
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                Scene scene = new Scene(vbox);
+                                Stage stage = new Stage();
+                                stage.setScene(scene);
+                                stage.setTitle(idApp.getData().getName());
+                                stage.show();
+                                idApp = null;
                             }
-                            Scene scene = new Scene(vbox);
-                            Stage stage = new Stage();
-                            stage.setScene(scene);
-                            stage.setTitle(idApp.getData().getName());
-                            stage.show();
-                            idApp = null;
-                        }
-                    });
+                        });
+                    } else {
+                        Alert alert;
+                        alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Game details not found");
+                        alert.setContentText("Game details not found in Steam Database. Sorry.");
+                        alert.showAndWait();
+                        idApp = null;
+                    }
                 }
             }
         });

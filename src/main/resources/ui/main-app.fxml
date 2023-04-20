@@ -52,8 +52,9 @@
                </font>
             </Text>
             <Text layoutX="129.0" layoutY="96.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your SteamID or CommunityURL down below" />
-            <ProgressBar fx:id="pgBar" layoutX="164.0" layoutY="189.0" prefWidth="200.0" progress="0.0" visible="false" />
-            <Text fx:id="txtBar" layoutX="253.0" layoutY="226.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+            <ProgressBar fx:id="pgBar" layoutX="136.0" layoutY="189.0" prefHeight="18.0" prefWidth="258.0" progress="0.0" />
+            <Text fx:id="txtBar" layoutX="194.0" layoutY="227.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="115.20001220703125" />
+            <Text fx:id="txtBar1" layoutX="191.0" layoutY="252.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="122.60003662109375" />
       </children>
     </AnchorPane>
   </children>
