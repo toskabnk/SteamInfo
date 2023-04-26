@@ -65,19 +65,39 @@ public class GameInfoController implements Initializable {
             throw new RuntimeException(e);
         }
         tGameName.setText(data.getName());
+
         tShortDescription.setText(data.getShort_description());
         tShortDescription.setWrappingWidth(440);
-        tWebsite.setText(data.getWebsite());
-        if(data.getAchievements() == null){
-            tNOfAchievements.setText("0");
+
+        if(data.getWebsite() == null){
+            tWebsite.setText("No website data");
         } else {
-            tNOfAchievements.setText(String.valueOf(data.getAchievements().getTotal()));
+            tWebsite.setText(data.getWebsite());
         }
-        tRecommendations.setText(String.valueOf(data.getRecommendations().getTotal()));
-        if(data.getMetacritic() == null){
-            tMetacritc.setText("No data");
+
+        String achievements = "Number of achievements: ";
+        if(data.getAchievements() == null){
+            achievements = achievements + "0";
+            tNOfAchievements.setText(achievements);
         } else {
-            tMetacritc.setText(String.valueOf(data.getMetacritic().getScore()));
+            achievements = achievements + String.valueOf(data.getAchievements().getTotal());
+            tNOfAchievements.setText(achievements);
+        }
+
+        if(data.getRecommendations() == null){
+            tRecommendations.setText("No recommendations data");
+        } else {
+            String recomendations = "Number of recommendations: " + String.valueOf(data.getRecommendations().getTotal());
+            tRecommendations.setText(recomendations);
+        }
+
+        String metracritic = "Metacritic score: ";
+        if(data.getMetacritic() == null){
+            metracritic = metracritic + "No data";
+            tMetacritc.setText(metracritic);
+        } else {
+            metracritic = metracritic + String.valueOf(data.getMetacritic().getScore());
+            tMetacritc.setText(metracritic);
         }
 
         lvAchievements.setCellFactory(new Callback<ListView<Achievement>, ListCell<Achievement>>() {
