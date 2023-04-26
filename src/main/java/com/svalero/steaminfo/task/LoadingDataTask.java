@@ -101,7 +101,11 @@ public class LoadingDataTask extends Task<Integer> {
                 };
 
                 this.userInfoTask = new UserInfoTask(playerConsumer, API_KEY, userID);
-                new Thread(userInfoTask).start();
+                Thread userInfo = new Thread(userInfoTask);
+                userInfo.start();
+                message.put(1, "Searching...");
+                while (userInfo.isAlive()){
+                }
             } else {
                 message.put(0, "Checking Vanity..");
                 updateMessage(String.valueOf(message));
@@ -118,17 +122,11 @@ public class LoadingDataTask extends Task<Integer> {
         }
 
         //Si no es correcto mostramos un mensaje de error
-        Alert alert;
         if(!correct){
             updateProgress(100, 100);
             message.put(0, "SteamID not found");
+            message.put(1, "Error");
             updateMessage(String.valueOf(message));
-            alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("SteamID not found");
-            alert.setContentText("SteamID not found, please, check the ID or VanityURL");
-
-            alert.showAndWait();
 
             //Si es correcto conseguimos los datos del jugador
         } else {
