@@ -68,10 +68,19 @@ public class AppController {
                 message = new JSONArray(newValue);
                 txtBar.setText(message.get(0).toString());
                 txtBar1.setText(message.get(1).toString());
+
+                if(message.get(1).toString().equals("Error")){
+                    Alert alert;
+                    alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("SteamID not found");
+                    alert.setContentText("SteamID not found, please, check the ID or VanityURL");
+
+                    alert.showAndWait();
+                }
             }
         });
 
         new Thread(loadingDataTask).start();
-        System.out.println("Ey");
     }
 }
