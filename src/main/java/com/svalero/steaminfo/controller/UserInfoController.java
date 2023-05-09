@@ -7,6 +7,7 @@ import com.svalero.steaminfo.model.appDetails.IDApp;
 import com.svalero.steaminfo.task.ExportDataTask;
 import com.svalero.steaminfo.task.GameInfoTask;
 import com.svalero.steaminfo.util.R;
+import io.reactivex.Completable;
 import io.reactivex.functions.Consumer;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -40,7 +41,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class UserInfoController implements Initializable {
     private Player player;
@@ -249,6 +252,15 @@ public class UserInfoController implements Initializable {
 
     @FXML
     public void exportDataCSV(ActionEvent actionEvent){
+        export(false);
+    }
+
+    @FXML
+    public void exportDataZIP(ActionEvent actionEvent){
+        export(true);
+    }
+
+    private void export(boolean zipFile){
         csvProgress.progressProperty().unbind();
 
         FileChooser fileChooser = new FileChooser();
@@ -259,19 +271,38 @@ public class UserInfoController implements Initializable {
         File file = fileChooser.showSaveDialog(gameList.getScene().getWindow());
 
         if(file != null){
-            exportDataTask = new ExportDataTask(gamesListObservable, file);
+            exportDataTask = new ExportDataTask(gamesListObservable, file, zipFile);
+            csvProgress.progressProperty().bind(exportDataTask.progressProperty());
+            /*
             exportDataTask.messageProperty().addListener((observableValue, s, t1) -> {
                 if(t1.equals("Ok")){
                     Alert alert;
                     alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.setTitle("Data exported");
                     alert.setHeaderText("Game Data exported succesfully");
-                    alert.setContentText("CSV Exported.");
+                    alert.setContentText(":D");
                     alert.showAndWait();
                 }
             });
-            csvProgress.progressProperty().bind(exportDataTask.progressProperty());
-            new Thread(exportDataTask).start();
+
+             */
+
+            CompletableFuture<Integer> completableFuture = CompletableFuture.supplyAsync(() -> {
+                exportDataTask.run();
+                return exportDataTask.getValue();
+            });
+
+            completableFuture.exceptionally(ex -> {
+                Platform.runLater(() -> {
+                    Alert alert;
+                    alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Data exported");
+                    alert.setHeaderText("Game Data exported succesfully");
+                    alert.setContentText("Check destination folder");
+                    alert.showAndWait();
+                });
+                return null;
+            });
         }
     }
 }

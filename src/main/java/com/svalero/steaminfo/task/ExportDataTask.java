@@ -4,6 +4,7 @@ import com.svalero.steaminfo.controller.GameInfoController;
 import com.svalero.steaminfo.model.Game;
 import com.svalero.steaminfo.model.appDetails.IDApp;
 import com.svalero.steaminfo.util.R;
+import com.svalero.steaminfo.util.ZipCompressor;
 import io.reactivex.functions.Consumer;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -20,14 +21,16 @@ import java.util.Map;
 public class ExportDataTask extends Task<Integer> {
     private List<Game> gameList;
     private File file;
+    boolean zipFile;
     private GameInfoTask gameInfoTask;
     private IDApp idApp = null;
     private static final String CSV_SEPARATOR = ";";
     Integer currentIter = 0;
 
-    public ExportDataTask(List<Game> gameList, File file){
+    public ExportDataTask(List<Game> gameList, File file, boolean zipFile){
         this.gameList = gameList;
         this.file = file;
+        this.zipFile = zipFile;
     }
 
     @Override
@@ -125,7 +128,11 @@ public class ExportDataTask extends Task<Integer> {
                 idApp = null;
                 bufferedWriter.write(line.toString());
                 bufferedWriter.newLine();
-                Thread.sleep(50);
+                //Para no pasar el rate limit
+                Thread.sleep(1000);
+            }
+            if(zipFile){
+                ZipCompressor.createZip(file.getAbsolutePath());
             }
             updateProgress(1,1);
             updateMessage("Ok");
@@ -133,6 +140,6 @@ public class ExportDataTask extends Task<Integer> {
             bufferedWriter.close();
         } catch (IOException ignored){
         }
-        return null;
+        return 1;
     }
 }
