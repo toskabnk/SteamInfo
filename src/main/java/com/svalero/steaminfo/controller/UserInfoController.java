@@ -4,8 +4,10 @@ import com.svalero.steaminfo.model.AllData;
 import com.svalero.steaminfo.model.Game;
 import com.svalero.steaminfo.model.Player;
 import com.svalero.steaminfo.model.appDetails.IDApp;
+import com.svalero.steaminfo.task.ExportDataTask;
 import com.svalero.steaminfo.task.GameInfoTask;
 import com.svalero.steaminfo.util.R;
+import io.reactivex.Completable;
 import io.reactivex.functions.Consumer;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -20,16 +22,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -41,7 +41,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class UserInfoController implements Initializable {
     private Player player;
@@ -61,8 +63,11 @@ public class UserInfoController implements Initializable {
     private ImageView userAvatar;
     @FXML
     private ListView<Game> gameList;
+    @FXML
+    private ProgressBar csvProgress;
 
     private GameInfoTask gameInfoTask;
+    private ExportDataTask exportDataTask;
     private IDApp idApp = null;
     ObservableList<Game> gamesListObservable;
     ObservableList<Game> gamesListObservableCopy;
@@ -243,5 +248,61 @@ public class UserInfoController implements Initializable {
         InputStream inputStream = url.openStream();
         Image image = new Image(inputStream);
         return image;
+    }
+
+    @FXML
+    public void exportDataCSV(ActionEvent actionEvent){
+        export(false);
+    }
+
+    @FXML
+    public void exportDataZIP(ActionEvent actionEvent){
+        export(true);
+    }
+
+    private void export(boolean zipFile){
+        csvProgress.progressProperty().unbind();
+
+        FileChooser fileChooser = new FileChooser();
+
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("CSV files (*.csv", "*.csv");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = fileChooser.showSaveDialog(gameList.getScene().getWindow());
+
+        if(file != null){
+            exportDataTask = new ExportDataTask(gamesListObservable, file, zipFile);
+            csvProgress.progressProperty().bind(exportDataTask.progressProperty());
+            /*
+            exportDataTask.messageProperty().addListener((observableValue, s, t1) -> {
+                if(t1.equals("Ok")){
+                    Alert alert;
+                    alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Data exported");
+                    alert.setHeaderText("Game Data exported succesfully");
+                    alert.setContentText(":D");
+                    alert.showAndWait();
+                }
+            });
+
+             */
+
+            CompletableFuture<Integer> completableFuture = CompletableFuture.supplyAsync(() -> {
+                exportDataTask.run();
+                return exportDataTask.getValue();
+            });
+
+            completableFuture.exceptionally(ex -> {
+                Platform.runLater(() -> {
+                    Alert alert;
+                    alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Data exported");
+                    alert.setHeaderText("Game Data exported succesfully");
+                    alert.setContentText("Check destination folder");
+                    alert.showAndWait();
+                });
+                return null;
+            });
+        }
     }
 }
