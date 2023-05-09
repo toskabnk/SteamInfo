@@ -32,7 +32,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -61,13 +63,15 @@
                </font>
             </Text>
             <Text fx:id="tHours" layoutX="104.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You have spent x hours of your life" wrappingWidth="500.075439453125" />
-            <ListView fx:id="gameList" layoutX="23.0" layoutY="176.0" prefHeight="200.0" prefWidth="591.0" />
+            <ListView fx:id="gameList" layoutX="14.0" layoutY="176.0" prefHeight="200.0" prefWidth="600.0" />
             <TextField fx:id="tfSearch" layoutX="331.0" layoutY="136.0" prefHeight="26.0" prefWidth="283.0" />
             <Text layoutX="203.0" layoutY="154.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Search game name:">
                <font>
                   <Font size="14.0" />
                </font>
             </Text>
+            <Button fx:id="btCSV" layoutX="15.0" layoutY="123.0" mnemonicParsing="false" onAction="#exportDataCSV" text="Export Data" />
+            <ProgressBar fx:id="csvProgress" layoutX="14.0" layoutY="149.0" prefHeight="18.0" prefWidth="80.0" progress="0.0" />
          </children>
     </AnchorPane>
   </children>
