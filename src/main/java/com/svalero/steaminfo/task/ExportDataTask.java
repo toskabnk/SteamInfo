@@ -131,13 +131,13 @@ public class ExportDataTask extends Task<Integer> {
                 //Para no pasar el rate limit
                 Thread.sleep(1000);
             }
+            bufferedWriter.flush();
+            bufferedWriter.close();
             if(zipFile){
                 ZipCompressor.createZip(file.getAbsolutePath());
             }
             updateProgress(1,1);
             updateMessage("Ok");
-            bufferedWriter.flush();
-            bufferedWriter.close();
         } catch (IOException ignored){
         }
         return 1;
